@@ -10,3 +10,17 @@ This script requires the [droplet_kit](https://github.com/digitalocean/droplet_k
 To-Do:
 - Additional Security measures on servers (iptables, fail2ban, etc)
 - DNS Entry creation
+
+### To Use this script
+
+First install the droplet_kit gem
+
+```
+gem install droplet_kit
+```
+
+Then run create_cluster.rb
+
+```
+ruby create_cluster.rb
+```
