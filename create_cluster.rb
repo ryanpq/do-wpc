@@ -5,7 +5,7 @@
 ##############################################################
 # Settings
 @ssh_keys=['599525'] # ID of the ssh key(s) to use.
-@token='dfa5c00e1cb996a6b74e971a6fc70b08f9b47ae0c3b9987df1791a287ec63850' # Token Here
+@token='' # Token Here
 ##############################################################
 require 'droplet_kit'
 require 'securerandom'
@@ -325,5 +325,9 @@ mysqlInfo = deployMySQL(mysql_size)
 glusterInfo = deployGluster(gluster_count, gluster_size, gluster_replica)
 
 mysql_private_ip = mysqlInfo["private_ip"]
+mysql_pass = mysqlInfo["mysql_pass"]
 gluster_mount = glusterInfo[:mount]
-deployNginxWeb(web_count,gluster_mount,mysql_private_ip,web_size)
+web_servers = deployNginxWeb(web_count,gluster_mount,mysql_private_ip,web_size,mysql_pass)
+lbip = deployNginxLB(web_servers,lb_size)
+
+puts "Deploy Complete! You can view your new site at:  http://#{lbip}"
