@@ -4,8 +4,8 @@
 # on DigitalOcean droplets
 ##############################################################
 # Settings
-@ssh_keys=['599525'] # ID of the ssh key(s) to use.
-@token='' # Token Here
+@ssh_keys=[''] # ID of the ssh key(s) to use.
+@token='' # DigitalOcean API Token
 ##############################################################
 require 'droplet_kit'
 require 'securerandom'
@@ -43,6 +43,8 @@ while domain == ''
   puts " "
   domain = gets.chomp()
 end
+
+@domain = domain
 
 # Choose MySQL Droplet Size
 system('clear') or system('cls')
@@ -321,13 +323,31 @@ gets.chomp()
 @region = datacenter
 @domain = domain
 
-mysqlInfo = deployMySQL(mysql_size)
-glusterInfo = deployGluster(gluster_count, gluster_size, gluster_replica)
+@zone = {}
+@a_records = []
 
+
+mysqlInfo = deployMySQL(mysql_size)
+a_rec = {"name" => 'mysql', "ip" => mysqlInfo["public_ip"]}
+@a_records.push(a_rec)
 mysql_private_ip = mysqlInfo["private_ip"]
 mysql_pass = mysqlInfo["mysql_pass"]
+
+glusterInfo = deployGluster(gluster_count, gluster_size, gluster_replica)
 gluster_mount = glusterInfo[:mount]
+
+
 web_servers = deployNginxWeb(web_count,gluster_mount,mysql_private_ip,web_size,mysql_pass)
 lbip = deployNginxLB(web_servers,lb_size)
+createDomainDNS(@domain,lbip)
+a_rec = {"name" => 'www', "ip" => lbip}
+@a_records.push(a_rec)
+
+@a_records.each {|record|
+ name = record["name"]
+ ip = record["ip"]
+ createArecord(@domain,name,ip)
+}
+
 
 puts "Deploy Complete! You can view your new site at:  http://#{lbip}"

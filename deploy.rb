@@ -1,11 +1,21 @@
 # deploy.rb
 
-def createDomainDNS()
-  
+def createDomainDNS(domain,ip)
+  puts "Creating DNS entry for #{domain}"
+  new_domain = DropletKit::Domain.new(name: domain, ip_address: ip)
+  client = DropletKit::Client.new(access_token: @token)
+  client.domains.create(new_domain)
 end
 
-def createArecord(name,ip)
-  
+def createArecord(domain,name,ip)
+  puts "Creating A record for #{name} pointing to #{ip}"
+  client = DropletKit::Client.new(access_token: @token)
+  domain_record = DropletKit::DomainRecord.new(
+  type: 'A',
+  name: name,
+  data: ip
+)
+client.domain_records.create(domain_record, for_domain: @domain)
 end
 
 def deployMySQL(droplet_size)
@@ -121,6 +131,9 @@ EOM
     public_ip = dobj.networks.v4[0].ip_address
   end
   
+  a_rec = {"name" => 'gluster1', "ip" => public_ip}
+  @a_records.push(a_rec)
+  
   puts " "
   puts "GlusterFS Node 1 Creation Complete."
   puts "Private IP: #{private_ip}"
@@ -181,6 +194,11 @@ EOM
     puts "Private IP: #{private_ip}"
     puts "Public IP: #{public_ip}"
     gluster_node = {"public_ip" => public_ip, "private_ip" => private_ip}
+    
+  
+    a_rec = {"name" => "gluster#{nct}", "ip" => public_ip}
+    @a_records.push(a_rec)
+    
     gluster_nodes.push(gluster_node)
     nct += 1
     
@@ -248,6 +266,9 @@ EOM
       private_ip = dobj.networks.v4[1].ip_address
       public_ip = dobj.networks.v4[0].ip_address
     end
+    
+    a_rec = {"name" => "gluster#{nct}", "ip" => public_ip}
+    @a_records.push(a_rec)
     puts " "
     puts "GlusterFS Node #{nct} Creation Complete."
     puts "Private IP: #{private_ip}"
@@ -286,6 +307,7 @@ apt-get -y install nginx glusterfs-client php5-fpm php5-mysql;
 sed -i s/\;cgi\.fix_pathinfo\=1/cgi\.fix_pathinfo\=0/g /etc/php5/fpm/php.ini;
 mkdir /gluster;
 mount -t glusterfs #{gluster_mount} /gluster;
+echo "#{gluster_mount} /gluster glusterfs defaults,_netdev 0 0" >> /etc/fstab;
 mkdir /gluster/www;
 wget https://raw.githubusercontent.com/ryanpq/do-wpc/master/default -O /etc/nginx/sites-enabled/default;
 service nginx restart;
@@ -327,7 +349,8 @@ EOM
     private_ip = dobj.networks.v4[1].ip_address
     public_ip = dobj.networks.v4[0].ip_address
   end
-  
+  a_rec = {"name" => "web1", "ip" => public_ip}
+  @a_records.push(a_rec)
   # Create a DNS record for this node
   puts " "
   puts "Web Server #1 Creation Complete."
@@ -352,6 +375,7 @@ apt-get -y install nginx glusterfs-client php5-fpm php5-mysql;
 sed -i s/\;cgi\.fix_pathinfo\=1/cgi\.fix_pathinfo\=0/g /etc/php5/fpm/php.ini;
 mkdir /gluster;
 mount -t glusterfs #{gluster_mount} /gluster;
+echo "#{gluster_mount} /gluster glusterfs defaults,_netdev 0 0" >> /etc/fstab;
 mkdir /gluster/www;
 wget https://raw.githubusercontent.com/ryanpq/do-wpc/master/default -O /etc/nginx/sites-enabled/default;
 service nginx restart;
@@ -385,6 +409,8 @@ EOM
     private_ip = dobj.networks.v4[1].ip_address
     public_ip = dobj.networks.v4[0].ip_address
   end
+  a_rec = {"name" => "web#{nct}", "ip" => public_ip}
+    @a_records.push(a_rec)
   
   # Create a DNS record for this node
   puts " "
