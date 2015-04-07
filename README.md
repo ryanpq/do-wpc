@@ -1,7 +1,8 @@
 # do-wpc
 
 ![](http://i.imgur.com/ywvlGmJ.png)
-Work in Progress
+
+This script was created based on the DigitalOcean tutorial which can be found [here](https://www.digitalocean.com/community/tutorials/automating-the-deployment-of-a-scalable-wordpress-site).
 
 This script will create a scalable Wordpress deployment consisting of a MySQL server, multiple GlusterFS nodes, multiple nginx web server nodes and an Nginx load balancer using the DigitalOcean API, user-data and droplet meta-data.
 

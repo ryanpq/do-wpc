@@ -320,6 +320,7 @@ sed -i "s/'DB_NAME', 'database_name_here'/'DB_NAME', 'wordpress'/g" /gluster/www
 sed -i "s/'DB_USER', 'username_here'/'DB_USER', 'wordpress'/g" /gluster/www/wp-config.php;
 sed -i "s/'DB_PASSWORD', 'password_here'/'DB_PASSWORD', '#{mysql_pass}'/g" /gluster/www/wp-config.php;
 sed -i "s/'DB_HOST', 'localhost'/'DB_HOST', '#{mysql_ip}'/g" /gluster/www/wp-config.php;
+chown -Rf www-data:www-data /gluster/www;
 EOM
     client = DropletKit::Client.new(access_token: @token)
     droplet = DropletKit::Droplet.new(name: sitename, region: @region, size: droplet_size, image: image_slug, user_data: userdata, ssh_keys: @ssh_keys, private_networking: true)
