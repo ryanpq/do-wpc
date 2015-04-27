@@ -291,6 +291,8 @@ while datacenter == ''
   puts "3.) LON1 - London, UK"
   puts "4.) SGP1 - Singapore"
   puts "5.) SFO1 - San Francisco, CA"
+  puts "6.) FRA1 - Frankfurt, DE"
+  
   puts " "
   dc_choice = gets.chomp().to_i
   if dc_choice == 1
@@ -303,6 +305,8 @@ while datacenter == ''
     datacenter = 'sgp1'
   elsif dc_choice == 5
     datacenter = 'sfo1'
+  elsif dc_choice == 6
+    datacenter = 'fra1'
   else
     system("clear")
     puts "Invalid Option Selected.  Please try again:"
