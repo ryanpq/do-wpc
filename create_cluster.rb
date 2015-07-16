@@ -14,6 +14,23 @@ require './deploy.rb'
 # clear the screen
 system('clear') or system('cls')
 
+session = DropletKit::Client.new(access_token: @token)
+ssh_id_array = Array.new
+session.ssh_keys.all().each { |x|  ssh_id_array.push(x) }
+puts "Enter which key you would like to use"
+puts "-------------------------------------"
+puts " "
+count = 1
+ssh_id_array.each { |ssh_key|
+        puts "#{count.to_s} #{ssh_key.name} #{ssh_key.id}"
+        count += 1
+        }
+puts "-------------------------------------"
+ssh_keys = ssh_id_array[gets.chomp().to_i-1].id
+#puts ssh_keys
+
+system('clear') or system('cls')
+
 puts "Multi-Node Wordpres Deployment Tool"
 puts "-----------------------------------"
 puts " "
