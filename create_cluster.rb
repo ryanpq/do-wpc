@@ -11,6 +11,56 @@ require 'droplet_kit'
 require 'securerandom'
 require './deploy.rb'
 
+require 'io/console'
+
+def yesno()
+  case $stdin.getch
+    when "Y" then true
+    when "N" then false
+    when "n" then false
+    when "y" then true
+    else 
+      puts "Invalid character."
+      yesno()
+  end
+end
+
+session = DropletKit::Client.new(access_token: @token)
+ssh_id_array = Array.new
+session.ssh_keys.all().each { |x|  ssh_id_array.push(x) }
+puts "PICK YOUR SSH KEY"
+count = 1
+ssh_id_array.each { |ssh_key| 
+  puts "#{count.to_s} #{ssh_key.name} #{ssh_key.id}" 
+  count += 1
+  }
+
+keys_complete = false
+user_keys = []
+while keys_complete == false
+  puts "Please select a key:"
+  user_input = gets.chomp()
+  if user_input.to_i.between?(1,session.ssh_keys.all().count.to_i)
+    if user_keys.include? user_input.to_i
+      puts 'That key has already been selected'
+    else
+      user_keys.push(user_input)
+    end
+  else
+    puts "You need to select a key from the list."
+  end
+  puts "Do you want to add any other keys? [Y/N]"
+  if yesno()
+    keys_complete = false
+  else
+    keys_complete = true
+  end
+end 
+puts ssh_id_array[1]
+user_keys.each { |keys_blah| 
+  @ssh_keys.push(ssh_id_array[keys_blah.to_i-1].id)
+}
+
 # clear the screen
 system('clear') or system('cls')
 
