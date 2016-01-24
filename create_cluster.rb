@@ -286,12 +286,13 @@ datacenter = ''
 while datacenter == ''
   puts "In which datacenter do you wish to deploy?"
   puts " "
-  puts "1.) NYC3 - New York, NY"
+  puts "1.) NYC3 - New York, US"
   puts "2.) AMS2 - Amsterdam, NE"
   puts "3.) LON1 - London, UK"
   puts "4.) SGP1 - Singapore"
-  puts "5.) SFO1 - San Francisco, CA"
+  puts "5.) SFO1 - San Francisco, US"
   puts "6.) FRA1 - Frankfurt, DE"
+  puts "7.) TOR1 - Toronto, CA"
   
   puts " "
   dc_choice = gets.chomp().to_i
@@ -307,6 +308,8 @@ while datacenter == ''
     datacenter = 'sfo1'
   elsif dc_choice == 6
     datacenter = 'fra1'
+  elsif dc_choice == 7
+    datacenter = 'tor1'
   else
     system("clear")
     puts "Invalid Option Selected.  Please try again:"
