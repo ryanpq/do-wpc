@@ -156,7 +156,7 @@ while gluster_count == 0
     puts "Enter a number of nodes to create:"
   elsif gluster_replica == 2
     puts "Enter a number of nodes to create (must be a multiple of 2):"
-  elsif gluster replica == 3
+  elsif gluster_replica == 3
     puts "Enter a number of nodes to create (must be a multiple of 3):"
   else
     puts "ERROR: Gluster Replica Count is not valid."
@@ -195,7 +195,7 @@ end
 system('clear') or system('cls')
 web_size = 0
 while web_size == 0
-  puts "What size droplets do you wish to use for your Nginx web sever nodes?"
+  puts "What size droplets do you wish to use for your Nginx web server nodes?"
   puts " "
   puts "1.)  1GB RAM |   1 CPU Core |  30GB Disk |  $10/mo"
   puts "2.)  2GB RAM |  2 CPU Cores |  40GB Disk |  $20/mo"
