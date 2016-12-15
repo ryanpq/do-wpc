@@ -156,7 +156,7 @@ while gluster_count == 0
     puts "Enter a number of nodes to create:"
   elsif gluster_replica == 2
     puts "Enter a number of nodes to create (must be a multiple of 2):"
-  elsif gluster replica == 3
+  elsif gluster_replica == 3
     puts "Enter a number of nodes to create (must be a multiple of 3):"
   else
     puts "ERROR: Gluster Replica Count is not valid."
