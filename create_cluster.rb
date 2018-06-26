@@ -107,8 +107,8 @@ while gluster_replica == 0
   puts "replication setting for your GlusterFS cluster."
   puts " "
   puts "1.) No replication, use all available disk space."
-  puts "2.) replicate = 2 - replicate all files on 2 nodes. Nodes must be created in multiples of 2"
-  puts "3.) replicate = 3 - replicate all files on 3 nodes. Nodes must be created in multiples of 3"
+  puts "2.) replicate = 2 - replicate all files on 2 nodes. Nodes must be created in multiples of 2 (Not recommended!)"
+  puts "3.) replicate = 3 - replicate all files on 3 nodes. Nodes must be created in multiples of 3 (Recommended)"
   puts " "
   puts "Enter a number and press Enter to continue."
   gluster_replica_count = gets.chomp().to_i
