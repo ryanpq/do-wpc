@@ -170,7 +170,7 @@ end
 system('clear') or system('cls')
 web_size = 0
 while web_size == 0
-  puts "What size droplets do you wish to use for your Nginx web sever nodes?"
+  puts "What size droplets do you wish to use for your Nginx web server nodes?"
   puts " "
   sizes.each_with_index do |size,index|
     if size.memory/1024 == 0
