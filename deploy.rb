@@ -20,7 +20,7 @@ end
 
 def deployMySQL(droplet_size)
   sitename = "mysql.#{@domain}"
-  image_slug = 'ubuntu-14-04-x64'
+  image_slug = 'ubuntu-18-04-x64'
   mysql_pass = SecureRandom.hex
 userdata = <<-EOM
 #!/bin/bash
@@ -31,10 +31,10 @@ apt-get update;
 apt-get -y install mysql-server;
 mysqladmin -u root create wordpress;
 mysqladmin -u root password "#{mysql_pass}";
-sed -i.bak "s/127.0.0.1/$PRIVATE_IP/g" /etc/mysql/my.cnf;
+sed -i.bak "s/127.0.0.1/$PRIVATE_IP/g" /etc/mysql/mysql.conf.d/mysqld.cnf;
 service mysql restart;
 mysql -uroot -p#{mysql_pass} -e "CREATE USER 'wordpress'@'%' IDENTIFIED BY '#{mysql_pass}'";
-mysql -uroot -p#{mysql_pass} -e "GRANT ALL PRIVILEGES ON wordpress.* TO 'wordpress'@'%'";
+mysql -uroot -p#{mysql_pass} -e "GRANT ALL ON wordpress.* TO 'wordpress'@'%'";
 EOM
   client = DropletKit::Client.new(access_token: @token)
   droplet = DropletKit::Droplet.new(name: sitename, region: @region, size: droplet_size, image: image_slug, user_data: userdata, ssh_keys: @ssh_keys, private_networking: true)
@@ -86,7 +86,7 @@ end
 
 
 def deployGluster(num_of_nodes,droplet_size,replica)
-  image_slug = 'ubuntu-14-04-x64'
+  image_slug = 'ubuntu-18-04-x64'
   sitename = "gluster1.#{@domain}"
   gluster_nodes = Array.new
 userdata = <<-EOM
@@ -95,8 +95,8 @@ export DEBIAN_FRONTEND=noninteractive;
 export PUBLIC_IP=$(curl -s http://169.254.169.254/metadata/v1/interfaces/public/0/ipv4/address)
 export PRIVATE_IP=$(curl -s http://169.254.169.254/metadata/v1/interfaces/private/0/ipv4/address)
 apt-get update;
-apt-get install -y python-software-properties;
-add-apt-repository -y ppa:gluster/glusterfs-3.5;
+apt-get install -y software-properties-common;
+add-apt-repository -y ppa:gluster/glusterfs-3.13;
 apt-get update;
 apt-get install -y glusterfs-server;
 EOM
@@ -155,8 +155,8 @@ export DEBIAN_FRONTEND=noninteractive;
 export PUBLIC_IP=$(curl -s http://169.254.169.254/metadata/v1/interfaces/public/0/ipv4/address)
 export PRIVATE_IP=$(curl -s http://169.254.169.254/metadata/v1/interfaces/private/0/ipv4/address)
 apt-get update;
-apt-get install -y python-software-properties;
-add-apt-repository -y ppa:gluster/glusterfs-3.5;
+apt-get install -y software-properties-common;
+add-apt-repository -y ppa:gluster/glusterfs-3.13;
 apt-get update;
 apt-get install -y glusterfs-server;
 EOM
@@ -228,13 +228,13 @@ export DEBIAN_FRONTEND=noninteractive;
 export PUBLIC_IP=$(curl -s http://169.254.169.254/metadata/v1/interfaces/public/0/ipv4/address)
 export PRIVATE_IP=$(curl -s http://169.254.169.254/metadata/v1/interfaces/private/0/ipv4/address)
 apt-get update;
-apt-get install -y python-software-properties;
-add-apt-repository -y ppa:gluster/glusterfs-3.5;
+apt-get install -y software-properties-common;
+add-apt-repository -y ppa:gluster/glusterfs-3.13;
 apt-get update;
 apt-get install -y glusterfs-server;
-sleep 30
+sleep 40
 #{gluster_peer_probes}
-gluster volume create file_store #{replica_conf}transport tcp #{gluster_peers}$PRIVATE_IP:/gluster force;
+gluster volume create file_store #{replica_conf} transport tcp #{gluster_peers}$PRIVATE_IP:/gluster force;
 gluster volume start file_store;
 EOM
     client = DropletKit::Client.new(access_token: @token)
@@ -294,7 +294,7 @@ def deployNginxWeb(num_of_nodes,gluster_mount,mysql_ip,droplet_size,mysql_pass)
   web_servers = []
   
   
-image_slug = 'ubuntu-14-04-x64'
+image_slug = 'ubuntu-18-04-x64'
 sitename = "web1.#{@domain}"
 # Create the first node and populate the gluster mount point with WP files.
 userdata = <<-EOM
@@ -303,8 +303,8 @@ export DEBIAN_FRONTEND=noninteractive;
 export PUBLIC_IP=$(curl -s http://169.254.169.254/metadata/v1/interfaces/public/0/ipv4/address)
 export PRIVATE_IP=$(curl -s http://169.254.169.254/metadata/v1/interfaces/private/0/ipv4/address)
 apt-get update;
-apt-get -y install nginx glusterfs-client php5-fpm php5-mysql;
-sed -i s/\;cgi\.fix_pathinfo\=1/cgi\.fix_pathinfo\=0/g /etc/php5/fpm/php.ini;
+apt-get -y install nginx glusterfs-client php7.2-fpm php7.2-mysql php7.2-curl;
+sed -i s/\;cgi\.fix_pathinfo\=1/cgi\.fix_pathinfo\=0/g /etc/php/7.2/fpm/php.ini;
 mkdir /gluster;
 mount -t glusterfs #{gluster_mount} /gluster;
 echo "#{gluster_mount} /gluster glusterfs defaults,_netdev 0 0" >> /etc/fstab;
@@ -372,8 +372,8 @@ export DEBIAN_FRONTEND=noninteractive;
 export PUBLIC_IP=$(curl -s http://169.254.169.254/metadata/v1/interfaces/public/0/ipv4/address)
 export PRIVATE_IP=$(curl -s http://169.254.169.254/metadata/v1/interfaces/private/0/ipv4/address)
 apt-get update;
-apt-get -y install nginx glusterfs-client php5-fpm php5-mysql;
-sed -i s/\;cgi\.fix_pathinfo\=1/cgi\.fix_pathinfo\=0/g /etc/php5/fpm/php.ini;
+apt-get -y install nginx glusterfs-client php7.2-fpm php7.2-mysql php7.2-curl;
+sed -i s/\;cgi\.fix_pathinfo\=1/cgi\.fix_pathinfo\=0/g /etc/php/7.2/fpm/php.ini;
 mkdir /gluster;
 mount -t glusterfs #{gluster_mount} /gluster;
 echo "#{gluster_mount} /gluster glusterfs defaults,_netdev 0 0" >> /etc/fstab;
@@ -430,7 +430,7 @@ end
 end
 
 def deployNginxLB(web_servers,droplet_size)
-  image_slug = 'ubuntu-14-04-x64'
+  image_slug = 'ubuntu-18-04-x64'
   sitename = "www.#{@domain}"
   backends = ''
   web_servers.each {|server|

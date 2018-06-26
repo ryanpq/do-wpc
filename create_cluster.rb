@@ -10,11 +10,13 @@
 require 'droplet_kit'
 require 'securerandom'
 require './deploy.rb'
+client = DropletKit::Client.new(access_token: @token)
+sizes = client.sizes.all
 
 # clear the screen
 system('clear') or system('cls')
 
-puts "Multi-Node Wordpres Deployment Tool"
+puts "Multi-Node Wordpress Deployment Tool"
 puts "-----------------------------------"
 puts " "
 puts "This script will deploy a multi-node Wordpress instance including"
@@ -52,36 +54,23 @@ mysql_size = 0
 while mysql_size == 0
   puts "What size droplet do you wish to use for your MySQL server?"
   puts " "
-  puts "1.)  1GB RAM |   1 CPU Core |  30GB Disk |  $10/mo"
-  puts "2.)  2GB RAM |  2 CPU Cores |  40GB Disk |  $20/mo"
-  puts "3.)  4GB RAM |  2 CPU Cores |  60GB Disk |  $40/mo"
-  puts "4.)  8GB RAM |  4 CPU Cores |  80GB Disk |  $80/mo"
-  puts "5.) 16GB RAM |  8 CPU Cores | 160GB Disk | $160/mo"
-  puts "6.) 32GB RAM | 12 CPU Cores | 320GB Disk | $320/mo"
-  puts "7.) 48GB RAM | 16 CPU Cores | 480GB Disk | $480/mo"
+  sizes.each_with_index do |size,index|
+    if size.memory/1024 == 0
+      next
+    end
+    puts "#{index}.) #{size.memory/1024}GB RAM | #{size.vcpus} CPU | #{size.disk}GB Disk | #{size.transfer}GB Transfer $#{(size.price_monthly).to_i}/mo (#{size.slug})"
+  end
   puts " "
   puts "Enter a number and press Enter."
   mysql_size_choice = gets.chomp().to_i
   
-  if mysql_size_choice == 1
-    mysql_size = '1gb'
-  elsif mysql_size_choice == 2
-    mysql_size = '2gb'
-  elsif mysql_size_choice == 3
-    mysql_size = '4gb'
-  elsif mysql_size_choice == 4
-    mysql_size = '8gb'
-  elsif mysql_size_choice == 5
-    mysql_size = '16gb'
-  elsif mysql_size_choice == 6
-    mysql_size = '32gb'  
-  elsif mysql_size_choice == 7  
-    mysql_size = '48gb'
-  else
+  if mysql_size_choice >= sizes.count || mysql_size_choice < 1
     mysql_size = 0
     system('clear') or system('cls')
     puts "Invalid Droplet Size Selected.  Please try again."
     puts " "
+  else
+    mysql_size = sizes[mysql_size_choice].slug
   end
 end
 
@@ -91,37 +80,23 @@ gluster_size = 0
 while gluster_size == 0
   puts "What size droplet do you wish to use for your GlusterFS nodes?"
   puts " "
-  puts "1.)  1GB RAM |   1 CPU Core |  30GB Disk |  $10/mo"
-  puts "2.)  2GB RAM |  2 CPU Cores |  40GB Disk |  $20/mo"
-  puts "3.)  4GB RAM |  2 CPU Cores |  60GB Disk |  $40/mo"
-  puts "4.)  8GB RAM |  4 CPU Cores |  80GB Disk |  $80/mo"
-  puts "5.) 16GB RAM |  8 CPU Cores | 160GB Disk | $160/mo"
-  puts "6.) 32GB RAM | 12 CPU Cores | 320GB Disk | $320/mo"
-  puts "7.) 48GB RAM | 16 CPU Cores | 480GB Disk | $480/mo"
+  sizes.each_with_index do |size,index|
+    if size.memory/1024 == 0
+      next
+    end
+    puts "#{index}.) #{size.memory/1024}GB RAM | #{size.vcpus} CPU | #{size.disk}GB Disk | #{size.transfer}GB Transfer $#{(size.price_monthly).to_i}/mo (#{size.slug})"
+  end
   puts " "
   puts "Enter a number and press Enter."
   gluster_size_choice = gets.chomp().to_i
   
-  if gluster_size_choice == 1
-    gluster_size = '1gb'
-  elsif gluster_size_choice == 2
-    gluster_size = '2gb'
-  elsif gluster_size_choice == 3
-    
-    gluster_size = '4gb'
-  elsif gluster_size_choice == 4
-    gluster_size = '8gb'
-  elsif gluster_size_choice == 5
-    gluster_size = '16gb'
-  elsif gluster_size_choice == 6
-    gluster_size = '32gb'  
-  elsif gluster_size_choice == 7  
-    gluster_size = '48gb'
-  else
+  if gluster_size_choice >= sizes.count || gluster_size_choice < 1
     gluster_size = 0
     system('clear') or system('cls')
     puts "Invalid Droplet Size Selected.  Please try again."
     puts " "
+  else
+    gluster_size = sizes[gluster_size_choice].slug
   end
 end
 system('clear') or system('cls')
@@ -156,7 +131,7 @@ while gluster_count == 0
     puts "Enter a number of nodes to create:"
   elsif gluster_replica == 2
     puts "Enter a number of nodes to create (must be a multiple of 2):"
-  elsif gluster replica == 3
+  elsif gluster_replica == 3
     puts "Enter a number of nodes to create (must be a multiple of 3):"
   else
     puts "ERROR: Gluster Replica Count is not valid."
@@ -197,37 +172,23 @@ web_size = 0
 while web_size == 0
   puts "What size droplets do you wish to use for your Nginx web sever nodes?"
   puts " "
-  puts "1.)  1GB RAM |   1 CPU Core |  30GB Disk |  $10/mo"
-  puts "2.)  2GB RAM |  2 CPU Cores |  40GB Disk |  $20/mo"
-  puts "3.)  4GB RAM |  2 CPU Cores |  60GB Disk |  $40/mo"
-  puts "4.)  8GB RAM |  4 CPU Cores |  80GB Disk |  $80/mo"
-  puts "5.) 16GB RAM |  8 CPU Cores | 160GB Disk | $160/mo"
-  puts "6.) 32GB RAM | 12 CPU Cores | 320GB Disk | $320/mo"
-  puts "7.) 48GB RAM | 16 CPU Cores | 480GB Disk | $480/mo"
+  sizes.each_with_index do |size,index|
+    if size.memory/1024 == 0
+      next
+    end
+    puts "#{index}.) #{size.memory/1024}GB RAM | #{size.vcpus} CPU | #{size.disk}GB Disk | #{size.transfer}GB Transfer $#{(size.price_monthly).to_i}/mo (#{size.slug})"
+  end
   puts " "
   puts "Enter a number and press Enter."
   web_size_choice = gets.chomp().to_i
   
-  if web_size_choice == 1
-    web_size = '1gb'
-  elsif web_size_choice == 2
-    web_size = '2gb'
-  elsif web_size_choice == 3
-    
-    web_size = '4gb'
-  elsif web_size_choice == 4
-    web_size = '8gb'
-  elsif web_size_choice == 5
-    web_size = '16gb'
-  elsif web_size_choice == 6
-    web_size = '32gb'  
-  elsif web_size_choice == 7  
-    web_size = '48gb'
-  else
+  if web_size_choice >= sizes.count || web_size_choice < 1
     web_size = 0
     system('clear') or system('cls')
     puts "Invalid Droplet Size Selected.  Please try again."
     puts " "
+  else
+    web_size = sizes[web_size_choice].slug
   end
 end
 system('clear') or system('cls')
@@ -246,71 +207,47 @@ lb_size = 0
 while lb_size == 0
   puts "What size droplet do you wish to use for your nginx load balancer?"
   puts " "
-  puts "1.)  1GB RAM |   1 CPU Core |  30GB Disk |  $10/mo"
-  puts "2.)  2GB RAM |  2 CPU Cores |  40GB Disk |  $20/mo"
-  puts "3.)  4GB RAM |  2 CPU Cores |  60GB Disk |  $40/mo"
-  puts "4.)  8GB RAM |  4 CPU Cores |  80GB Disk |  $80/mo"
-  puts "5.) 16GB RAM |  8 CPU Cores | 160GB Disk | $160/mo"
-  puts "6.) 32GB RAM | 12 CPU Cores | 320GB Disk | $320/mo"
-  puts "7.) 48GB RAM | 16 CPU Cores | 480GB Disk | $480/mo"
+  sizes.each_with_index do |size,index|
+    if size.memory/1024 == 0
+      next
+    end
+    puts "#{index}.) #{size.memory/1024}GB RAM | #{size.vcpus} CPU | #{size.disk}GB Disk | #{size.transfer}GB Transfer $#{(size.price_monthly).to_i}/mo (#{size.slug})"
+  end
   puts " "
   puts "Enter a number and press Enter."
   lb_size_choice = gets.chomp().to_i
   
-  if lb_size_choice == 1
-    lb_size = '1gb'
-  elsif lb_size_choice == 2
-    lb_size = '2gb'
-  elsif lb_size_choice == 3
-    
-    lb_size = '4gb'
-  elsif lb_size_choice == 4
-    lb_size = '8gb'
-  elsif lb_size_choice == 5
-    lb_size = '16gb'
-  elsif lb_size_choice == 6
-    lb_size = '32gb'  
-  elsif lb_size_choice == 7  
-    lb_size = '48gb'
-  else
+  if lb_size_choice >= sizes.count || lb_size_choice < 1
     lb_size = 0
     system('clear') or system('cls')
     puts "Invalid Droplet Size Selected.  Please try again."
     puts " "
+  else
+    lb_size = sizes[lb_size_choice].slug
   end
 end
 
 # Finally, get the datacenter to use.
 system('clear') or system('cls')
 datacenter = ''
+regions = client.regions.all
 while datacenter == ''
   puts "In which datacenter do you wish to deploy?"
   puts " "
-  puts "1.) NYC3 - New York, NY"
-  puts "2.) AMS2 - Amsterdam, NE"
-  puts "3.) LON1 - London, UK"
-  puts "4.) SGP1 - Singapore"
-  puts "5.) SFO1 - San Francisco, CA"
-  puts "6.) FRA1 - Frankfurt, DE"
-  
+  regions.each_with_index do |region,index|
+    thisIndex = index + 1
+    puts "#{thisIndex}.) #{region.slug.upcase} - #{region.name}"
+  end
   puts " "
+  puts "Enter a number and press Enter."
   dc_choice = gets.chomp().to_i
-  if dc_choice == 1
-    datacenter = 'nyc3'
-  elsif dc_choice == 2
-    datacenter = 'ams2'
-  elsif dc_choice == 3
-    datacenter = 'lon1'
-  elsif dc_choice == 4
-    datacenter = 'sgp1'
-  elsif dc_choice == 5
-    datacenter = 'sfo1'
-  elsif dc_choice == 6
-    datacenter = 'fra1'
-  else
+  
+  if dc_choice > regions.count || dc_choice < 1
     system("clear")
     puts "Invalid Option Selected.  Please try again:"
     datacenter = ''
+  else
+    datacenter = regions[dc_choice - 1].slug
   end
   
 end
